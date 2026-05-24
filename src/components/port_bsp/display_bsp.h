@@ -10,7 +10,7 @@
 #define AlgorithmOptimization  3     //1:原始算法 2:采用移位算法 3:查表法   来优化CPU
 
 enum ColorSelection {
-    ColorBlack = 0,    
+    ColorBlack = 0,
     ColorWhite = 0xff
 };
 
@@ -30,10 +30,10 @@ class DisplayPort {
     uint8_t            *DispBuffer = NULL;
     int                 DisplayLen;
 #if (AlgorithmOptimization == 3)
-	uint16_t (*PixelIndexLUT)[300];
-	uint8_t  (*PixelBitLUT  )[300];
-	void InitPortraitLUT();
-	void InitLandscapeLUT();
+    uint16_t (*PixelIndexLUT)[300];
+    uint8_t  (*PixelBitLUT  )[300];
+    void InitPortraitLUT();
+    void InitLandscapeLUT();
 #endif
 
     void Set_ResetIOLevel(uint8_t level);
@@ -48,11 +48,11 @@ class DisplayPort {
     void RLCD_Init();
     void RLCD_ColorClear(uint8_t color);
     void RLCD_Display();
-	#if (AlgorithmOptimization != 3)
+    #if (AlgorithmOptimization != 3)
     void RLCD_SetPortraitPixel(uint16_t x, uint16_t y, uint8_t color);      //竖屏显示
     void RLCD_SetLandscapePixel(uint16_t x, uint16_t y, uint8_t color);     //横屏显示
-	#endif
-	#if (AlgorithmOptimization == 3)
-	void RLCD_SetPixel(uint16_t x, uint16_t y, uint8_t color);
-	#endif
+    #endif
+    #if (AlgorithmOptimization == 3)
+    void RLCD_SetPixel(uint16_t x, uint16_t y, uint8_t color);
+    #endif
 };

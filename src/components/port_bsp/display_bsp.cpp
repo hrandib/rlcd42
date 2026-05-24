@@ -51,8 +51,8 @@ height_(height)
     assert(DispBuffer);
 
 #if (AlgorithmOptimization == 3)
-	PixelIndexLUT = (uint16_t (*)[300])heap_caps_malloc(transfer * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
-	PixelBitLUT   = (uint8_t (*)[300])heap_caps_malloc(transfer * sizeof(uint8_t), MALLOC_CAP_SPIRAM);
+    PixelIndexLUT = (uint16_t (*)[300])heap_caps_malloc(transfer * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
+    PixelBitLUT   = (uint8_t (*)[300])heap_caps_malloc(transfer * sizeof(uint8_t), MALLOC_CAP_SPIRAM);
     assert(PixelIndexLUT);
     assert(PixelBitLUT);
     if(width_ == 400) {
@@ -70,115 +70,115 @@ void DisplayPort::RLCD_Init() {
     RLCD_Reset();
 
     RLCD_SendCommand(0xD6);  // NVM Load Control
-	RLCD_SendData(0x17);
-	RLCD_SendData(0x02);
+    RLCD_SendData(0x17);
+    RLCD_SendData(0x02);
 
-	RLCD_SendCommand(0xD1); //Booster Enable
-	RLCD_SendData(0x01);
+    RLCD_SendCommand(0xD1); //Booster Enable
+    RLCD_SendData(0x01);
 
-	RLCD_SendCommand(0xC0); //Gate Voltage Control
-	RLCD_SendData(0x11);
-	RLCD_SendData(0x04);
+    RLCD_SendCommand(0xC0); //Gate Voltage Control
+    RLCD_SendData(0x11);
+    RLCD_SendData(0x04);
 
-	RLCD_SendCommand(0xC1); //VSHP Setting
-	RLCD_SendData(0x69);
-	RLCD_SendData(0x69);
-	RLCD_SendData(0x69);
-	RLCD_SendData(0x69);
+    RLCD_SendCommand(0xC1); //VSHP Setting
+    RLCD_SendData(0x69);
+    RLCD_SendData(0x69);
+    RLCD_SendData(0x69);
+    RLCD_SendData(0x69);
 
-	RLCD_SendCommand(0xC2);
-	RLCD_SendData(0x19);
-	RLCD_SendData(0x19);
-	RLCD_SendData(0x19);
-	RLCD_SendData(0x19);
+    RLCD_SendCommand(0xC2);
+    RLCD_SendData(0x19);
+    RLCD_SendData(0x19);
+    RLCD_SendData(0x19);
+    RLCD_SendData(0x19);
 
-	RLCD_SendCommand(0xC4);
-	RLCD_SendData(0x4B);
-	RLCD_SendData(0x4B);
-	RLCD_SendData(0x4B);
-	RLCD_SendData(0x4B);
+    RLCD_SendCommand(0xC4);
+    RLCD_SendData(0x4B);
+    RLCD_SendData(0x4B);
+    RLCD_SendData(0x4B);
+    RLCD_SendData(0x4B);
 
-	RLCD_SendCommand(0xC5);
-	RLCD_SendData(0x19);
-	RLCD_SendData(0x19);
-	RLCD_SendData(0x19);
-	RLCD_SendData(0x19);
+    RLCD_SendCommand(0xC5);
+    RLCD_SendData(0x19);
+    RLCD_SendData(0x19);
+    RLCD_SendData(0x19);
+    RLCD_SendData(0x19);
 
-	RLCD_SendCommand(0xD8);
-	RLCD_SendData(0x80);
-	RLCD_SendData(0xE9);
+    RLCD_SendCommand(0xD8);
+    RLCD_SendData(0x80);
+    RLCD_SendData(0xE9);
 
-	RLCD_SendCommand(0xB2);
-	RLCD_SendData(0x02);
+    RLCD_SendCommand(0xB2);
+    RLCD_SendData(0x02);
 
-	RLCD_SendCommand(0xB3);
-	RLCD_SendData(0xE5);
-	RLCD_SendData(0xF6);
-	RLCD_SendData(0x05);
-	RLCD_SendData(0x46);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x76);
-	RLCD_SendData(0x45);
+    RLCD_SendCommand(0xB3);
+    RLCD_SendData(0xE5);
+    RLCD_SendData(0xF6);
+    RLCD_SendData(0x05);
+    RLCD_SendData(0x46);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x76);
+    RLCD_SendData(0x45);
 
-	RLCD_SendCommand(0xB4);
-	RLCD_SendData(0x05);
-	RLCD_SendData(0x46);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x77);
-	RLCD_SendData(0x76);
-	RLCD_SendData(0x45);
+    RLCD_SendCommand(0xB4);
+    RLCD_SendData(0x05);
+    RLCD_SendData(0x46);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x77);
+    RLCD_SendData(0x76);
+    RLCD_SendData(0x45);
 
-	RLCD_SendCommand(0x62);
-	RLCD_SendData(0x32);
-	RLCD_SendData(0x03);
-	RLCD_SendData(0x1F);
+    RLCD_SendCommand(0x62);
+    RLCD_SendData(0x32);
+    RLCD_SendData(0x03);
+    RLCD_SendData(0x1F);
 
-	RLCD_SendCommand(0xB7);
-	RLCD_SendData(0x13);
+    RLCD_SendCommand(0xB7);
+    RLCD_SendData(0x13);
 
-	RLCD_SendCommand(0xB0);
-	RLCD_SendData(0x64);
+    RLCD_SendCommand(0xB0);
+    RLCD_SendData(0x64);
 
-	RLCD_SendCommand(0x11);
-	vTaskDelay(pdMS_TO_TICKS(200));
-	RLCD_SendCommand(0xC9);
-	RLCD_SendData(0x00);
+    RLCD_SendCommand(0x11);
+    vTaskDelay(pdMS_TO_TICKS(200));
+    RLCD_SendCommand(0xC9);
+    RLCD_SendData(0x00);
 
-	RLCD_SendCommand(0x36);
-	RLCD_SendData(0x48);
+    RLCD_SendCommand(0x36);
+    RLCD_SendData(0x48);
 
-	RLCD_SendCommand(0x3A);
-	RLCD_SendData(0x11);
+    RLCD_SendCommand(0x3A);
+    RLCD_SendData(0x11);
 
-	RLCD_SendCommand(0xB9);
-	RLCD_SendData(0x20);
+    RLCD_SendCommand(0xB9);
+    RLCD_SendData(0x20);
 
-	RLCD_SendCommand(0xB8);
-	RLCD_SendData(0x29);
+    RLCD_SendCommand(0xB8);
+    RLCD_SendData(0x29);
 
-	RLCD_SendCommand(0x21);
+    RLCD_SendCommand(0x21);
 
-	RLCD_SendCommand(0x2A);
-	RLCD_SendData(0x12);
-	RLCD_SendData(0x2A);
+    RLCD_SendCommand(0x2A);
+    RLCD_SendData(0x12);
+    RLCD_SendData(0x2A);
 
-	RLCD_SendCommand(0x2B);
-	RLCD_SendData(0x00);
-	RLCD_SendData(0xC7);
+    RLCD_SendCommand(0x2B);
+    RLCD_SendData(0x00);
+    RLCD_SendData(0xC7);
 
-	RLCD_SendCommand(0x35);
-	RLCD_SendData(0x00);
+    RLCD_SendCommand(0x35);
+    RLCD_SendData(0x00);
 
-	RLCD_SendCommand(0xD0);
-	RLCD_SendData(0xFF);
+    RLCD_SendCommand(0xD0);
+    RLCD_SendData(0xFF);
 
-	RLCD_SendCommand(0x38);
-	RLCD_SendCommand(0x29);
+    RLCD_SendCommand(0x38);
+    RLCD_SendCommand(0x29);
 
     RLCD_ColorClear(ColorWhite);
 }
@@ -189,16 +189,16 @@ void DisplayPort::RLCD_ColorClear(uint8_t color) {
 
 void DisplayPort::RLCD_Display() {
     RLCD_SendCommand(0x2A);     // Column Address Set
-  	RLCD_SendData(0x12);
-  	RLCD_SendData(0x2A);
+      RLCD_SendData(0x12);
+      RLCD_SendData(0x2A);
 
-  	RLCD_SendCommand(0x2B);     // Page Address Set
-  	RLCD_SendData(0x00);
-  	RLCD_SendData(0xC7);
+      RLCD_SendCommand(0x2B);     // Page Address Set
+      RLCD_SendData(0x00);
+      RLCD_SendData(0xC7);
 
-  	RLCD_SendCommand(0x2c);     // Page Address Set
+      RLCD_SendCommand(0x2c);     // Page Address Set
 
-	RLCD_Sendbuffera(DispBuffer,DisplayLen);
+    RLCD_Sendbuffera(DispBuffer,DisplayLen);
 }
 
 void DisplayPort::RLCD_Reset(void) {
@@ -229,11 +229,11 @@ void DisplayPort::Set_ResetIOLevel(uint8_t level) {
 
 void DisplayPort::RLCD_SetPortraitPixel(uint16_t x, uint16_t y, uint8_t color) {
     if((x >= width_) || (y >= height_)) {
-  	  	ESP_LOGE("Pixel","Beyond the limit : (%d,%d)",x ,y);
+            ESP_LOGE("Pixel","Beyond the limit : (%d,%d)",x ,y);
         return;
-  	}
+      }
 #if (AlgorithmOptimization == 2)
-	const uint16_t W4 = width_ >> 2;
+    const uint16_t W4 = width_ >> 2;
 
     uint16_t byte_x = x >> 2;
     uint16_t byte_y = y >> 1;
@@ -272,7 +272,7 @@ void DisplayPort::RLCD_SetLandscapePixel(uint16_t x, uint16_t y, uint8_t color) 
         return;
 #if (AlgorithmOptimization == 2)
 
-	uint16_t inv_y = (height_ - 1 - y);
+    uint16_t inv_y = (height_ - 1 - y);
     const uint16_t H4 = height_ >> 2;
     uint16_t byte_x = x >> 1;
     uint16_t block_y = inv_y >> 2;
