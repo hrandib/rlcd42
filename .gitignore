@@ -1,3 +1,6 @@
+.vscode/
+
 src/build/
+src/.cache/
 src/sdkconfig
 src/sdkconfig.old
