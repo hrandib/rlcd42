@@ -8,8 +8,7 @@
 
 #include "byteswap.h"
 #include "display_bsp.h"
-#include "driver/i2c_types.h"
-#include "i2c_scan.h"
+#include "i2c_bus.hpp"
 #include "shtc3_async.hpp"
 #include "u8g2_st7305.h"
 #include "user_config.h"
@@ -29,14 +28,6 @@ static void U8g2_DrawCenteredStr(u8g2_t* u8g2, int y, const char* text)
 
 static void U8g2_DisplayTask(u8g2_t* u8g2, Shtc3Async& shtc3)
 {
-    uint32_t counter = 0;
-    uint32_t frames = 0;
-    uint32_t last_report_frames = 0;
-    int64_t last_report_us = esp_timer_get_time();
-    uint32_t fps_x100 = 0;
-    uint32_t frame_us = 0;
-    uint32_t flush_us = 0;
-
     std::mutex mtx;
     Shtc3Async::SensorData sdata;
     shtc3.read([&sdata, &mtx](auto data) {
@@ -46,10 +37,7 @@ static void U8g2_DisplayTask(u8g2_t* u8g2, Shtc3Async& shtc3)
     });
 
     while(true) {
-        const int64_t frame_start_us = esp_timer_get_time();
-
         u8g2_ClearBuffer(u8g2);
-        u8g2_SetDrawColor(u8g2, 1);
 
         u8g2_SetFont(u8g2, u8g2_font_logisoso58_tf);
 
@@ -65,18 +53,13 @@ static void U8g2_DisplayTask(u8g2_t* u8g2, Shtc3Async& shtc3)
             snprintf(text, sizeof(text), "%.1f  %.1f", sdata.temperature, sdata.humidity);
         }
         U8g2_DrawCenteredStr(u8g2, number_y, text);
-
-        const int64_t flush_start_us = esp_timer_get_time();
         u8g2_SendBuffer(u8g2);
-        const int64_t now_us = esp_timer_get_time();
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    shtc3.stop();
-    shtc3.join();
 }
 
-static void U8g2_CounterTask(void*)
+static void U8g2_Main(void*)
 {
     u8g2_st7305_config_t config = u8g2_st7305_default_config();
     config.mosi_io = RLCD_MOSI_PIN;
@@ -89,10 +72,12 @@ static void U8g2_CounterTask(void*)
 
     ESP_ERROR_CHECK(u8g2_st7305_init(&g_u8g2_lcd, &config));
     u8g2_t* u8g2 = u8g2_st7305_get_u8g2(&g_u8g2_lcd);
+    u8g2_SetDrawColor(u8g2, 1);
 
-    auto bus_handle = scan_main();
+    I2CBus i2c_bus(ESP32_I2C_SCL_PIN, ESP32_I2C_SDA_PIN);
+    i2c_bus.scan();
 
-    Shtc3Async shtc3(bus_handle, ESP32_I2C_CLK_SPEED_HZ, Shtc3::MeasurementMode::NORMAL_MODE);
+    Shtc3Async shtc3(i2c_bus, ESP32_I2C_CLK_SPEED_HZ, Shtc3::MeasurementMode::NORMAL_MODE);
     esp_err_t init_ret = shtc3.init();
     ESP_RETURN_VOID_ON_ERROR(init_ret, TAG, "Failed to initialize SHTC3 device");
     ESP_LOGI(TAG, "Sensor initialization success");
@@ -104,6 +89,6 @@ static void U8g2_CounterTask(void*)
 
 extern "C" void app_main(void)
 {
-    BaseType_t ok = xTaskCreatePinnedToCore(U8g2_CounterTask, "rlcd42_main", 8192, NULL, 4, NULL, 1);
+    BaseType_t ok = xTaskCreatePinnedToCore(U8g2_Main, "rlcd42_main", 8192, NULL, 4, NULL, 1);
     configASSERT(ok == pdPASS);
 }

@@ -36,3 +36,8 @@ BraceWrapping:
   IndentBraces:    false
   SplitEmptyFunction: false
   SplitEmptyNamespace: false
+
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
