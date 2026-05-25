@@ -16,5 +16,6 @@
 /*i2c*/
 #define ESP32_I2C_SDA_PIN   GPIO_NUM_13
 #define ESP32_I2C_SCL_PIN   GPIO_NUM_14
+#define ESP32_I2C_CLK_SPEED_HZ 400000
 
 #endif

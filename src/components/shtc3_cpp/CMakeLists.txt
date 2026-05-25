@@ -1,0 +1,8 @@
+idf_component_register(
+    SRCS
+        "src/shtc3.cpp"
+    INCLUDE_DIRS
+        "include"
+    REQUIRES
+        esp_driver_i2c
+)
