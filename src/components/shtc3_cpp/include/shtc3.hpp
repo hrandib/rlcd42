@@ -6,28 +6,30 @@
 
 #pragma once
 
-#include <cstdint>
 #include "driver/i2c_master.h"
 #include "esp_err.h"
+#include <cstdint>
 
 /**
  * @brief SHTC3 Temperature and Humidity Sensor C++ Wrapper
  *
  * This class provides a C++ interface to the SHTC3 I2C humidity and temperature sensor.
  */
-class Shtc3 {
+class Shtc3
+{
 public:
     /**
      * @brief Measurement modes for the SHTC3 sensor
      */
     enum class MeasurementMode {
-        NORMAL_MODE,      ///< Normal mode (higher accuracy, more current)
-        LOW_POWER_MODE    ///< Low power mode (lower accuracy, less current)
+        NORMAL_MODE,   // Normal mode (higher accuracy, more current)
+        LOW_POWER_MODE // Low power mode (lower accuracy, less current)
     };
 
-    struct SensorData {
-        float temperature; ///< Temperature in Celsius
-        float humidity;    ///< Relative humidity in percentage
+    struct SensorData
+    {
+        float temperature; // Temperature in Celsius
+        float humidity;    // Relative humidity in percentage
     };
 
     /**
@@ -77,7 +79,7 @@ public:
      * @param id Pointer to buffer for ID (2 bytes)
      * @return ESP_OK on success, error code otherwise
      */
-    esp_err_t read_id(uint8_t *id);
+    esp_err_t read_id(uint8_t* id);
 
     /**
      * @brief Wake up the sensor
@@ -99,18 +101,18 @@ public:
      * @return ESP_OK on success, error code otherwise
      */
     esp_err_t reset();
-
 private:
     /**
      * @brief Clock stretching configuration
      */
     enum class ClockStretchingMode {
-        ENABLED,          ///< Clock stretching enabled
-        DISABLED          ///< Clock stretching disabled
+        ENABLED, // Clock stretching enabled
+        DISABLED // Clock stretching disabled
     };
 
     static constexpr uint8_t DEV_ADDR = 0x70; // Default I2C address for SHTC3
-    static constexpr ClockStretchingMode CLOCK_STRETCHING_MODE = ClockStretchingMode::DISABLED; // Default clock stretching mode
+    static constexpr ClockStretchingMode CLOCK_STRETCHING_MODE =
+      ClockStretchingMode::DISABLED; // Default clock stretching mode
 
     i2c_master_bus_handle_t bus_handle_;
     i2c_master_dev_handle_t dev_handle_;

@@ -1,34 +1,33 @@
 
-#include <stdio.h>
+#include "esp_check.h"
+#include <esp_log.h>
+#include <esp_timer.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_timer.h>
-#include <esp_log.h>
-#include "esp_check.h"
+#include <stdio.h>
 
+#include "byteswap.h"
 #include "display_bsp.h"
-#include "user_config.h"
-#include "u8g2_st7305.h"
 #include "driver/i2c_types.h"
 #include "i2c_scan.h"
-#include "byteswap.h"
 #include "shtc3_async.hpp"
+#include "u8g2_st7305.h"
+#include "user_config.h"
 
 static u8g2_st7305_t g_u8g2_lcd;
-static const char *TAG = "rlcd42";
+static const char* TAG = "rlcd42";
 
-static void U8g2_DrawCenteredStr(u8g2_t *u8g2, int y, const char *text)
+static void U8g2_DrawCenteredStr(u8g2_t* u8g2, int y, const char* text)
 {
     int text_width = (int)u8g2_GetStrWidth(u8g2, text);
     int x = (LCD_WIDTH - text_width) / 2;
-    if (x < 0)
-    {
+    if(x < 0) {
         x = 0;
     }
     u8g2_DrawStr(u8g2, x, y, text);
 }
 
-static void U8g2_DisplayTask(u8g2_t *u8g2, Shtc3Async &shtc3)
+static void U8g2_DisplayTask(u8g2_t* u8g2, Shtc3Async& shtc3)
 {
     uint32_t counter = 0;
     uint32_t frames = 0;
@@ -46,31 +45,30 @@ static void U8g2_DisplayTask(u8g2_t *u8g2, Shtc3Async &shtc3)
         sdata = data;
     });
 
-    while (true)
-    {
+    while(true) {
         const int64_t frame_start_us = esp_timer_get_time();
 
-            u8g2_ClearBuffer(u8g2);
-            u8g2_SetDrawColor(u8g2, 1);
+        u8g2_ClearBuffer(u8g2);
+        u8g2_SetDrawColor(u8g2, 1);
 
-            u8g2_SetFont(u8g2, u8g2_font_logisoso58_tf);
+        u8g2_SetFont(u8g2, u8g2_font_logisoso58_tf);
 
-            u8g2_DrawFrame(u8g2, 10, 10, 380, 280);
-            u8g2_DrawFrame(u8g2, 9, 9, 382, 282);
-            u8g2_DrawHLine(u8g2, 18, 260, 364);
+        u8g2_DrawFrame(u8g2, 10, 10, 380, 280);
+        u8g2_DrawFrame(u8g2, 9, 9, 382, 282);
+        u8g2_DrawHLine(u8g2, 18, 260, 364);
 
-            int number_height = u8g2_GetAscent(u8g2) - u8g2_GetDescent(u8g2);
-            int number_y = ((LCD_HEIGHT - number_height) / 2) + u8g2_GetAscent(u8g2);
-            char text[80];
-            {
-                std::lock_guard<std::mutex> lock(mtx);
-                snprintf(text, sizeof(text),  "%.1f  %.1f", sdata.temperature, sdata.humidity);
-            }
-            U8g2_DrawCenteredStr(u8g2, number_y, text);
+        int number_height = u8g2_GetAscent(u8g2) - u8g2_GetDescent(u8g2);
+        int number_y = ((LCD_HEIGHT - number_height) / 2) + u8g2_GetAscent(u8g2);
+        char text[80];
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            snprintf(text, sizeof(text), "%.1f  %.1f", sdata.temperature, sdata.humidity);
+        }
+        U8g2_DrawCenteredStr(u8g2, number_y, text);
 
-            const int64_t flush_start_us = esp_timer_get_time();
-            u8g2_SendBuffer(u8g2);
-            const int64_t now_us = esp_timer_get_time();
+        const int64_t flush_start_us = esp_timer_get_time();
+        u8g2_SendBuffer(u8g2);
+        const int64_t now_us = esp_timer_get_time();
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -78,7 +76,7 @@ static void U8g2_DisplayTask(u8g2_t *u8g2, Shtc3Async &shtc3)
     shtc3.join();
 }
 
-static void U8g2_CounterTask(void *)
+static void U8g2_CounterTask(void*)
 {
     u8g2_st7305_config_t config = u8g2_st7305_default_config();
     config.mosi_io = RLCD_MOSI_PIN;
@@ -90,7 +88,7 @@ static void U8g2_CounterTask(void *)
     config.tile_buf_height = U8G2_ST7305_TILE_BUF_FULL;
 
     ESP_ERROR_CHECK(u8g2_st7305_init(&g_u8g2_lcd, &config));
-    u8g2_t *u8g2 = u8g2_st7305_get_u8g2(&g_u8g2_lcd);
+    u8g2_t* u8g2 = u8g2_st7305_get_u8g2(&g_u8g2_lcd);
 
     auto bus_handle = scan_main();
 
