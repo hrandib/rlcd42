@@ -3,14 +3,17 @@
 ## TODO
 
 - [x] Project skeleton (display works)
-- [ ] Main screen layout
-- [ ] System screen layout
+- [x] Sensor driver
+- [ ] Battery ADC driver
+- [ ] RTC driver
+- [ ] Static UI layout
 - [ ] User buttons
 - [ ] Battery gauge
-- [ ] Internal sensor value display
 - [ ] Wifi connection
 - [ ] MQTT value display
 - [ ] MQTT JSON template support
 - [ ] Config files
-- [ ] Shell
+- [ ] USB MSC
+- [ ] Dynamic UI layout
+- [ ] Wakeup by RTC
 - [ ] Power consumption optimization
