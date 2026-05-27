@@ -21,7 +21,7 @@ void U8g2Drawables::DrawHLine(u8g2_uint_t x, u8g2_int_t y, u8g2_int_t x_offset, 
 
     // Handle x_offset
     u8g2_uint_t len;
-    if(x_offset >= 0) {
+    if(x_offset > 0) {
         // Positive offset: draw from x to (x + offset)
         len = x_offset;
     }
@@ -54,7 +54,7 @@ void U8g2Drawables::DrawVLine(u8g2_int_t x, u8g2_uint_t y, u8g2_int_t y_offset, 
 
     // Handle y_offset
     u8g2_uint_t len;
-    if(y_offset >= 0) {
+    if(y_offset > 0) {
         // Positive offset: draw from y to (y + offset)
         len = y_offset;
     }
@@ -82,13 +82,28 @@ void U8g2Drawables::DrawRFrame(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2
     u8g2_DrawRFrame(u8g2_, x, y, w, h, r);
 }
 
-void U8g2Drawables::DrawCenteredStr(u8g2_uint_t y, const char* text)
+void U8g2Drawables::DrawCenteredStr(u8g2_int_t x, u8g2_int_t y, const char* text)
 {
+    u8g2_int_t actual_x = x >= 0 ? x : GetDisplayWidth() + x;
+    u8g2_int_t actual_y = y >= 0 ? y : GetDisplayHeight() + y;
     int text_width = (int)u8g2_GetStrWidth(u8g2_, text);
-    int display_width = (int)u8g2_GetDisplayWidth(u8g2_);
-    int x = (display_width - text_width) / 2;
+
+    actual_x = actual_x - (text_width / 2);
     if(x < 0) {
         x = 0;
     }
-    u8g2_DrawStr(u8g2_, x, y, text);
+    u8g2_DrawStr(u8g2_, actual_x, actual_y, text);
+}
+
+void U8g2Drawables::DrawCenteredStrUtf8(u8g2_int_t x, u8g2_int_t y, const char* text)
+{
+    u8g2_int_t actual_x = x >= 0 ? x : GetDisplayWidth() + x;
+    u8g2_int_t actual_y = y >= 0 ? y : GetDisplayHeight() + y;
+    int text_width = (int)u8g2_GetStrWidth(u8g2_, text);
+
+    actual_x = actual_x - (text_width / 2);
+    if(x < 0) {
+        x = 0;
+    }
+    u8g2_DrawUTF8(u8g2_, actual_x, actual_y, text);
 }

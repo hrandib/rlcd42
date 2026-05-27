@@ -36,25 +36,22 @@ esp_err_t Screen::init_display()
     return ESP_OK;
 }
 
+void draw_grid(U8g2Drawables& drawer)
+{
+    drawer.DrawHLineCentered(100, LCD_HEIGHT / 2, 3);
+    drawer.DrawVLineCentered(LCD_WIDTH / 2, 70, 3);
+    drawer.DrawHLineCentered(0, -20, 2);
+}
+
 void Screen::display_task(void* screen_instance)
 {
     Screen* screen = static_cast<Screen*>(screen_instance);
     u8g2_t* u8g2 = screen->u8g2_;
     Shtc3Async& shtc3 = screen->shtc3_;
-
     while(true) {
-
         u8g2_ClearBuffer(u8g2);
-
-        u8g2_SetFont(u8g2, u8g2_font_logisoso58_tf);
         U8g2Drawables drawer(u8g2);
-
-        // Draw decorative line
-        drawer.DrawHLine(10, -30, -10, 3);
-
-        // Calculate vertical center position for sensor data
-        int number_height = u8g2_GetAscent(u8g2) - u8g2_GetDescent(u8g2);
-        int number_y = ((LCD_HEIGHT - number_height) / 2) + u8g2_GetAscent(u8g2);
+        draw_grid(drawer);
 
         // Read sensor data
         Shtc3Async::SensorData sdata;
@@ -63,9 +60,21 @@ void Screen::display_task(void* screen_instance)
         }
 
         // Display sensor values
+        drawer.SetFont(u8g2_font_logisoso78_tn);
         char text[80];
-        snprintf(text, sizeof(text), "%.1f  %.1f", sdata.temperature, sdata.humidity);
-        drawer.DrawCenteredStr(number_y, text);
+        snprintf(text, sizeof(text), "%.1f", sdata.temperature);
+        drawer.DrawStr(5, 120, text);
+        snprintf(text, sizeof(text), "%.1f", sdata.humidity);
+        drawer.DrawStr(-180, 120, text);
+
+        drawer.SetFont(u8g2_font_crox5hb_tf);
+        drawer.DrawCenteredStrUtf8(100, 30, "°C");
+        drawer.DrawCenteredStrUtf8(-100, 30, "%H");
+
+        drawer.SetFont(u8g2_font_siji_t_6x10);
+        drawer.DrawGlyph(-52, -6, 0xE210);
+        drawer.SetFont(u8g2_font_profont17_mr);
+        drawer.DrawStr(-40, -3, "100%");
 
         u8g2_SendBuffer(u8g2);
         vTaskDelay(pdMS_TO_TICKS(10000));
