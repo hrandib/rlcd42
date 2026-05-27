@@ -8,8 +8,10 @@
 
 #include "byteswap.h"
 #include "display_bsp.h"
+#include "esp_sleep.h"
 #include "i2c_bus.hpp"
 #include "shtc3_async.hpp"
+#include "u8g2_drawables.hpp"
 #include "u8g2_st7305.h"
 #include "user_config.h"
 
@@ -28,34 +30,36 @@ static void U8g2_DrawCenteredStr(u8g2_t* u8g2, int y, const char* text)
 
 static void U8g2_DisplayTask(u8g2_t* u8g2, Shtc3Async& shtc3)
 {
-    std::mutex mtx;
-    Shtc3Async::SensorData sdata;
-    shtc3.read([&sdata, &mtx](auto data) {
-        ESP_LOGI(TAG, "Temperature: %.1f °C, Humidity: %.1f %%", data.temperature, data.humidity);
-        std::lock_guard<std::mutex> lock(mtx);
-        sdata = data;
-    });
+    // std::mutex mtx;
+    // Shtc3Async::SensorData sdata;
+    // shtc3.read([&sdata, &mtx](auto data) {
+    //     ESP_LOGI(TAG, "Temperature: %.1f °C, Humidity: %.1f %%", data.temperature, data.humidity);
+    //     std::lock_guard<std::mutex> lock(mtx);
+    //     sdata = data;
+    // });
 
     while(true) {
         u8g2_ClearBuffer(u8g2);
 
         u8g2_SetFont(u8g2, u8g2_font_logisoso58_tf);
+        U8g2Drawables drawer(u8g2);
 
-        u8g2_DrawFrame(u8g2, 10, 10, 380, 280);
-        u8g2_DrawFrame(u8g2, 9, 9, 382, 282);
-        u8g2_DrawHLine(u8g2, 18, 260, 364);
+        // u8g2_DrawFrame(u8g2, 10, 10, 380, 280);
+        // u8g2_DrawFrame(u8g2, 9, 9, 382, 282);
+        drawer.DrawHLine(10, -30, -10, 3);
 
         int number_height = u8g2_GetAscent(u8g2) - u8g2_GetDescent(u8g2);
         int number_y = ((LCD_HEIGHT - number_height) / 2) + u8g2_GetAscent(u8g2);
-        char text[80];
-        {
-            std::lock_guard<std::mutex> lock(mtx);
-            snprintf(text, sizeof(text), "%.1f  %.1f", sdata.temperature, sdata.humidity);
+        Shtc3Async::SensorData sdata;
+        if(shtc3.read(sdata) == ESP_OK) {
+            ESP_LOGI(TAG, "Temperature: %.1f °C, Humidity: %.1f %%", sdata.temperature, sdata.humidity);
         }
+        char text[80];
+        snprintf(text, sizeof(text), "%.1f  %.1f", sdata.temperature, sdata.humidity);
         U8g2_DrawCenteredStr(u8g2, number_y, text);
         u8g2_SendBuffer(u8g2);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
