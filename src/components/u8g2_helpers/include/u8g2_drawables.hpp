@@ -99,4 +99,11 @@ public:
     {
         return u8g2_GetDisplayHeight(u8g2_);
     }
+
+    /**
+     * @brief Draw a string centered horizontally on the display
+     * @param y Y-coordinate for the text
+     * @param text String to draw
+     */
+    void DrawCenteredStr(u8g2_uint_t y, const char* text);
 };

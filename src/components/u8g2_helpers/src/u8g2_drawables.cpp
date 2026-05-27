@@ -81,3 +81,14 @@ void U8g2Drawables::DrawRFrame(u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2
 {
     u8g2_DrawRFrame(u8g2_, x, y, w, h, r);
 }
+
+void U8g2Drawables::DrawCenteredStr(u8g2_uint_t y, const char* text)
+{
+    int text_width = (int)u8g2_GetStrWidth(u8g2_, text);
+    int display_width = (int)u8g2_GetDisplayWidth(u8g2_);
+    int x = (display_width - text_width) / 2;
+    if(x < 0) {
+        x = 0;
+    }
+    u8g2_DrawStr(u8g2_, x, y, text);
+}

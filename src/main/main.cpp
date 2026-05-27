@@ -1,98 +1,39 @@
 
-#include "esp_check.h"
-#include <esp_log.h>
-#include <esp_timer.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <stdio.h>
 
-#include "byteswap.h"
-#include "display_bsp.h"
-#include "esp_sleep.h"
+#include "esp_check.h"
 #include "i2c_bus.hpp"
+#include "screen.hpp"
 #include "shtc3_async.hpp"
-#include "u8g2_drawables.hpp"
-#include "u8g2_st7305.h"
-#include "user_config.h"
 
-static u8g2_st7305_t g_u8g2_lcd;
-static const char* TAG = "rlcd42";
+static const char* TAG = "main";
 
-static void U8g2_DrawCenteredStr(u8g2_t* u8g2, int y, const char* text)
+static std::unique_ptr<Shtc3Async> initialize_sensor(i2c_master_bus_handle_t bus_handle)
 {
-    int text_width = (int)u8g2_GetStrWidth(u8g2, text);
-    int x = (LCD_WIDTH - text_width) / 2;
-    if(x < 0) {
-        x = 0;
+    auto shtc3 = std::make_unique<Shtc3Async>(bus_handle, ESP32_I2C_CLK_SPEED_HZ, Shtc3::MeasurementMode::NORMAL_MODE);
+    if(shtc3->init() != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize SHTC3 sensor");
+        return nullptr;
     }
-    u8g2_DrawStr(u8g2, x, y, text);
-}
-
-static void U8g2_DisplayTask(u8g2_t* u8g2, Shtc3Async& shtc3)
-{
-    // std::mutex mtx;
-    // Shtc3Async::SensorData sdata;
-    // shtc3.read([&sdata, &mtx](auto data) {
-    //     ESP_LOGI(TAG, "Temperature: %.1f °C, Humidity: %.1f %%", data.temperature, data.humidity);
-    //     std::lock_guard<std::mutex> lock(mtx);
-    //     sdata = data;
-    // });
-
-    while(true) {
-        u8g2_ClearBuffer(u8g2);
-
-        u8g2_SetFont(u8g2, u8g2_font_logisoso58_tf);
-        U8g2Drawables drawer(u8g2);
-
-        // u8g2_DrawFrame(u8g2, 10, 10, 380, 280);
-        // u8g2_DrawFrame(u8g2, 9, 9, 382, 282);
-        drawer.DrawHLine(10, -30, -10, 3);
-
-        int number_height = u8g2_GetAscent(u8g2) - u8g2_GetDescent(u8g2);
-        int number_y = ((LCD_HEIGHT - number_height) / 2) + u8g2_GetAscent(u8g2);
-        Shtc3Async::SensorData sdata;
-        if(shtc3.read(sdata) == ESP_OK) {
-            ESP_LOGI(TAG, "Temperature: %.1f °C, Humidity: %.1f %%", sdata.temperature, sdata.humidity);
-        }
-        char text[80];
-        snprintf(text, sizeof(text), "%.1f  %.1f", sdata.temperature, sdata.humidity);
-        U8g2_DrawCenteredStr(u8g2, number_y, text);
-        u8g2_SendBuffer(u8g2);
-
-        vTaskDelay(pdMS_TO_TICKS(10000));
-    }
-}
-
-static void U8g2_Main(void*)
-{
-    u8g2_st7305_config_t config = u8g2_st7305_default_config();
-    config.mosi_io = RLCD_MOSI_PIN;
-    config.sclk_io = RLCD_SCK_PIN;
-    config.dc_io = RLCD_DC_PIN;
-    config.cs_io = RLCD_CS_PIN;
-    config.reset_io = RLCD_RST_PIN;
-    config.rotation = U8G2_R1;
-    config.tile_buf_height = U8G2_ST7305_TILE_BUF_FULL;
-
-    ESP_ERROR_CHECK(u8g2_st7305_init(&g_u8g2_lcd, &config));
-    u8g2_t* u8g2 = u8g2_st7305_get_u8g2(&g_u8g2_lcd);
-    u8g2_SetDrawColor(u8g2, 1);
-
-    I2CBus i2c_bus(ESP32_I2C_SCL_PIN, ESP32_I2C_SDA_PIN);
-    i2c_bus.scan();
-
-    Shtc3Async shtc3(i2c_bus, ESP32_I2C_CLK_SPEED_HZ, Shtc3::MeasurementMode::NORMAL_MODE);
-    esp_err_t init_ret = shtc3.init();
-    ESP_RETURN_VOID_ON_ERROR(init_ret, TAG, "Failed to initialize SHTC3 device");
-    ESP_LOGI(TAG, "Sensor initialization success");
-
-    U8g2_DisplayTask(u8g2, shtc3);
-
-    vTaskDelete(NULL);
+    return shtc3;
 }
 
 extern "C" void app_main(void)
 {
-    BaseType_t ok = xTaskCreatePinnedToCore(U8g2_Main, "rlcd42_main", 8192, NULL, 4, NULL, 1);
-    configASSERT(ok == pdPASS);
+
+    I2CBus i2c_bus(ESP32_I2C_SCL_PIN, ESP32_I2C_SDA_PIN);
+    i2c_bus.scan();
+
+    auto shtc3 = initialize_sensor(i2c_bus);
+    if(!shtc3) {
+        ESP_LOGE(TAG, "Sensor initialization failed, halting");
+        return;
+    }
+
+    Screen screen(shtc3.get());
+    screen.init();
+    while(true) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }

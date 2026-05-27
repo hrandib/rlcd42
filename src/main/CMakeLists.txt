@@ -1,5 +1,7 @@
 idf_component_register(
-    SRCS "main.cpp"
+    SRCS
+        "main.cpp"
+        "screen.cpp"
     REQUIRES
         esp_timer
         port_bsp
