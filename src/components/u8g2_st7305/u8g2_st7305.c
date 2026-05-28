@@ -388,8 +388,11 @@ esp_err_t u8g2_st7305_init(u8g2_st7305_t *dev, const u8g2_st7305_config_t *confi
     u8g2_SetUserPtr(&dev->u8g2, dev);
     u8g2_SetupBuffer(&dev->u8g2, dev->buffer, dev->tile_buf_height,
                      u8g2_ll_hvline_vertical_top_lsb, rotation);
-    u8g2_InitDisplay(&dev->u8g2);
-    u8g2_SetPowerSave(&dev->u8g2, 0);
+
+    // if (!config->initialized) {
+        u8g2_InitDisplay(&dev->u8g2);
+        u8g2_SetPowerSave(&dev->u8g2, 0);
+    // }
 
     return ESP_OK;
 }

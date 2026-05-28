@@ -26,6 +26,7 @@ typedef struct {
     uint8_t tile_buf_height;
     const u8g2_cb_t *rotation;
     bool prefer_psram;
+    bool initialized;
 } u8g2_st7305_config_t;
 
 typedef struct {

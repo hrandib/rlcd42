@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "sensor_desc.hpp"
 #include "shtc3_async.hpp"
 #include "u8g2.h"
 #include "u8g2_st7305.h"

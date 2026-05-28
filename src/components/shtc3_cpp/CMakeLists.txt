@@ -5,4 +5,5 @@ idf_component_register(
         "include"
     REQUIRES
         esp_driver_i2c
+        sensor_interface
 )
