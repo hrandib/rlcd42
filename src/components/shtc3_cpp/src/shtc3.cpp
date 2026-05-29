@@ -14,10 +14,10 @@
 static const char* TAG = "SHTC3";
 
 // SHTC3 Register Addresses
-#define SHTC3_REG_WAKE 0x3517
-#define SHTC3_REG_SLEEP 0xB098
+#define SHTC3_REG_WAKE       0x3517
+#define SHTC3_REG_SLEEP      0xB098
 #define SHTC3_REG_SOFT_RESET 0x805D
-#define SHTC3_REG_READ_ID 0xEFC8
+#define SHTC3_REG_READ_ID    0xEFC8
 
 // Measurement registers
 #define SHTC3_REG_T_CSE_NM 0x7CA2 // Temperature first, clock stretching enabled, normal mode
@@ -25,9 +25,9 @@ static const char* TAG = "SHTC3";
 #define SHTC3_REG_T_CSE_LM 0x6458 // Temperature first, clock stretching enabled, low power mode
 #define SHTC3_REG_T_CSD_LM 0x609C // Temperature first, clock stretching disabled, low power mode
 
-#define SHTC3_WARMUP_US 240                // Warm-up time in microseconds
-#define SHTC3_MEASURE_DELAY_NORMAL_MS 13   // Measurement delay in milliseconds
-#define SHTC3_MEASURE_DELAY_LOW_POWER_MS 1 // Measurement delay in milliseconds
+#define SHTC3_WARMUP_US                  240 // Warm-up time in microseconds
+#define SHTC3_MEASURE_DELAY_NORMAL_MS    13  // Measurement delay in milliseconds
+#define SHTC3_MEASURE_DELAY_LOW_POWER_MS 1   // Measurement delay in milliseconds
 
 Shtc3::Shtc3(i2c_master_bus_handle_t bus_handle, uint32_t dev_speed, MeasurementMode mode) :
   bus_handle_(bus_handle), dev_handle_(nullptr), dev_speed_(dev_speed), measurement_mode_(mode), initialized_(false)

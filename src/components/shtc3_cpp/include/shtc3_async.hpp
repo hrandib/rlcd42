@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "esp_log.h"
 #include "isensordatasource.hpp"
 #include "shtc3.hpp"
 #include <atomic>
@@ -83,7 +84,7 @@ public:
         }
     }
 
-    const SensorDataArray& read_values() const
+    const SensorDataArray& read_values() override
     {
         SensorData values;
         esp_err_t err = Shtc3::read(values);

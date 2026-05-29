@@ -1,10 +1,12 @@
 idf_component_register(
-    SRCS 
-    "display_bsp.cpp" 
-    PRIV_REQUIRES 
-    driver
-    esp_timer 
+    SRCS
+        "display_bsp.cpp"
+        "adc_bsp.cpp"
+    PRIV_REQUIRES
+        esp_timer
     REQUIRES
-    esp_lcd
-    INCLUDE_DIRS 
-    "./")
+        esp_adc
+        esp_lcd
+    INCLUDE_DIRS
+        "./"
+)

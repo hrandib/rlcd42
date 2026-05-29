@@ -9,11 +9,13 @@
 #include "i2c_bus.hpp"
 #include "u8g2_drawables.hpp"
 
+#include "adc_bsp.h"
 #include "esp_sleep.h"
 #include "esp_system.h"
 #include "user_config.h"
 #include <esp_check.h>
 #include <esp_log.h>
+#include <format>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <stdio.h>
@@ -87,6 +89,8 @@ void Screen::display_task(void* screen_instance)
     Screen* screen = static_cast<Screen*>(screen_instance);
     u8g2_t* u8g2 = screen->u8g2_;
     Shtc3Async& shtc3 = screen->shtc3_;
+    Adc_PortInit();
+
     while(true) {
         u8g2_ClearBuffer(u8g2);
         U8g2Drawables drawer(u8g2);
@@ -100,20 +104,22 @@ void Screen::display_task(void* screen_instance)
 
         // Display sensor values
         drawer.SetFont(u8g2_font_logisoso78_tn);
-        char text[80];
-        snprintf(text, sizeof(text), "%.1f", sdata.temperature);
-        drawer.DrawStr(5, 120, text);
-        snprintf(text, sizeof(text), "%.1f", sdata.humidity);
-        drawer.DrawStr(-180, 120, text);
+        auto text = std::format("{:.1f}", sdata.temperature);
+        drawer.DrawStr(5, 120, text.c_str());
+        text = std::format("{:.1f}", sdata.humidity);
+        drawer.DrawStr(-180, 120, text.c_str());
 
         drawer.SetFont(u8g2_font_crox5hb_tf);
         drawer.DrawCenteredStrUtf8(100, 30, "°C");
         drawer.DrawCenteredStrUtf8(-100, 30, "%H");
 
         drawer.SetFont(u8g2_font_siji_t_6x10);
-        drawer.DrawGlyph(-52, -6, 0xE210);
+        drawer.DrawGlyph(-52, -5, 0xE210);
         drawer.SetFont(u8g2_font_profont17_mr);
-        drawer.DrawStr(-40, -3, "100%");
+
+        auto battery_level = Adc_GetBatteryLevel();
+        auto battery_text = std::format("{}%", battery_level);
+        drawer.DrawStr(-40, -4, battery_text.c_str());
 
         u8g2_SendBuffer(u8g2);
         vTaskDelay(pdMS_TO_TICKS(10000));

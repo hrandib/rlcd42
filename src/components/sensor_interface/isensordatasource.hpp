@@ -63,7 +63,7 @@ public:
         return source;
     }
 
-    virtual const SensorDataArray& read_values() const = 0;
+    virtual const SensorDataArray& read_values() = 0;
     virtual void on_update(sensor_callback_t callback) const {
         // The target class may not use asynchronous updates, so this can be a no-op by default. Derived classes that
         // support async updates can override this method to allow setting a callback
