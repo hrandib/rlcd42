@@ -21,11 +21,15 @@ class Shtc3Async : public Shtc3, public ISensorDataSource
 public:
     using Shtc3::read;
     using DataCallback = std::function<void(const SensorData&)>;
+
     Shtc3Async(i2c_master_bus_handle_t bus_handle,
                uint32_t dev_speed,
                MeasurementMode mode = MeasurementMode::NORMAL_MODE) :
       Shtc3(bus_handle, dev_speed, mode), ISensorDataSource("SHTC3"), running_(false)
-    { }
+    {
+        store_item("Temperature", "°C", "%.1f");
+        store_item("Humidity", "%", "%.1f");
+    }
 
     ~Shtc3Async()
     {
@@ -79,11 +83,17 @@ public:
         }
     }
 
-    void on_update(sensor_callback_t callback) const override
+    const SensorDataArray& read_values() const
     {
-        // This method can be used to set a callback that gets called whenever new data is read.
-        // For simplicity, we won't implement this in the async wrapper, but it could be done by
-        // storing the callback and invoking it in the read thread whenever new data is available.
+        SensorData values;
+        esp_err_t err = Shtc3::read(values);
+        if(err != ESP_OK) {
+            ESP_LOGE("Shtc3Async", "Failed to read sensor data: %s", esp_err_to_name(err));
+            return data_;
+        }
+        update_item("Temperature", values.temperature);
+        update_item("Humidity", values.humidity);
+        return data_;
     }
 private:
     std::thread worker_;
