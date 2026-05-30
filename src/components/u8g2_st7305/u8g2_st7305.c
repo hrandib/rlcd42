@@ -15,6 +15,17 @@
 #define ST7305_FULL_BUFFER_HEIGHT ST7305_TILE_HEIGHT
 #define ST7305_BUFFER_ROW_BYTES (ST7305_TILE_WIDTH * 8)
 #define ST7305_INVERTED_COLOR 0
+#define ST7305_LPM_ENABLE 1
+
+enum FrameRateLpm {
+    FRAMERATE_0_5FPS,
+    FRAMERATE_1FPS,
+    FRAMERATE_2FPS,
+    FRAMERATE_4FPS,
+    FRAMERATE_8FPS,
+};
+
+#define FRAMERATE_LPM FRAMERATE_8FPS
 
 static const char *TAG = "u8g2_st7305";
 
@@ -109,7 +120,7 @@ static void st7305_full_init(u8g2_st7305_t *dev)
     const uint8_t c2[] = {0x19, 0x19, 0x19, 0x19};
     const uint8_t c4[] = {0x4B, 0x4B, 0x4B, 0x4B};
     const uint8_t d8[] = {0x80, 0xE9};
-    const uint8_t b2[] = {0x02};
+    const uint8_t b2[] = {0x10 | FRAMERATE_LPM};
     const uint8_t b3[] = {0xE5, 0xF6, 0x05, 0x46, 0x77, 0x77, 0x77, 0x77, 0x76, 0x45};
     const uint8_t b4[] = {0x05, 0x46, 0x77, 0x77, 0x77, 0x77, 0x76, 0x45};
     const uint8_t g_timing[] = {0x32, 0x03, 0x1F};
@@ -151,7 +162,7 @@ static void st7305_full_init(u8g2_st7305_t *dev)
     ESP_ERROR_CHECK_WITHOUT_ABORT(st7305_write_cmd_data(dev, 0x2B, win_b, sizeof(win_b)));
     ESP_ERROR_CHECK_WITHOUT_ABORT(st7305_write_cmd_data(dev, 0x35, m35, sizeof(m35)));
     ESP_ERROR_CHECK_WITHOUT_ABORT(st7305_write_cmd_data(dev, 0xD0, d0, sizeof(d0)));
-    ESP_ERROR_CHECK_WITHOUT_ABORT(st7305_write_cmd(dev, 0x38));
+    ESP_ERROR_CHECK_WITHOUT_ABORT(st7305_write_cmd(dev, 0x38 | ST7305_LPM_ENABLE));
     ESP_ERROR_CHECK_WITHOUT_ABORT(st7305_write_cmd(dev, 0x29));
 }
 
@@ -389,10 +400,10 @@ esp_err_t u8g2_st7305_init(u8g2_st7305_t *dev, const u8g2_st7305_config_t *confi
     u8g2_SetupBuffer(&dev->u8g2, dev->buffer, dev->tile_buf_height,
                      u8g2_ll_hvline_vertical_top_lsb, rotation);
 
-    // if (!config->initialized) {
+    if (!config->initialized) {
         u8g2_InitDisplay(&dev->u8g2);
         u8g2_SetPowerSave(&dev->u8g2, 0);
-    // }
+    }
 
     return ESP_OK;
 }

@@ -23,6 +23,20 @@
 
 static const char* TAG = "screen";
 
+void prepare_display_for_deep_sleep(u8g2_t* u8g2)
+{
+    // 2. Ensure CS and RST are driven HIGH (inactive state)
+    gpio_set_level(RLCD_CS_PIN, 1);
+    gpio_set_level(RLCD_RST_PIN, 1);
+
+    // 3. Enable Pad Hold so the pins retain their states during deep sleep
+    gpio_hold_en((gpio_num_t)RLCD_CS_PIN);
+    gpio_hold_en((gpio_num_t)RLCD_RST_PIN);
+
+    // Enable digital pad hold globally for the deep sleep duration
+    gpio_deep_sleep_hold_en();
+}
+
 static esp_reset_reason_t get_reset_reason()
 {
     esp_reset_reason_t reason = esp_reset_reason();
@@ -66,6 +80,11 @@ esp_err_t Screen::init_display()
 
     if(get_reset_reason() == ESP_RST_DEEPSLEEP) {
         config.initialized = true; // Skip initialization if waking up from deep sleep to preserve display state
+        gpio_hold_dis((gpio_num_t)config.cs_io);
+        // Keep reset pin disabled to avoid resetting the display on wakeup
+        config.reset_io = static_cast<gpio_num_t>(-1);
+
+        gpio_set_level(RLCD_CS_PIN, 0);
     }
 
     ESP_RETURN_ON_ERROR(u8g2_st7305_init(&g_u8g2_lcd_, &config), TAG, "Failed to initialize u8g2 display");
@@ -142,6 +161,7 @@ void Screen::display_task(void* screen_instance)
 
         u8g2_SendBuffer(u8g2);
         vTaskDelay(pdMS_TO_TICKS(10000));
+        // prepare_display_for_deep_sleep(u8g2);
         // esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
         // esp_deep_sleep_start();
     }
