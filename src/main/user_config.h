@@ -1,7 +1,5 @@
-#ifndef USER_CONFIG_H
-#define USER_CONFIG_H
+#pragma once
 
-/*lcd init*/
 #define LCD_WIDTH  400
 #define LCD_HEIGHT 300
 
@@ -12,4 +10,9 @@
 #define RLCD_RST_PIN  GPIO_NUM_41
 #define RLCD_TE_PIN   GPIO_NUM_6
 
-#endif // USER_CONFIG_H
+#define I2S_DSDIN_PIN  GPIO_NUM_8
+#define I2S_SCLK_PIN   GPIO_NUM_9
+#define I2S_ASDOUT_PIN GPIO_NUM_10
+#define I2S_LRCK_PIN   GPIO_NUM_45
+
+#define PA_CTL_PIN GPIO_NUM_46

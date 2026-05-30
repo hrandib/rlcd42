@@ -3,6 +3,7 @@
 #include <freertos/task.h>
 
 #include "esp_check.h"
+#include "gpio_defaults.hpp"
 #include "i2c_bus.hpp"
 #include "screen.hpp"
 #include "shtc3_async.hpp"
@@ -21,15 +22,16 @@ static std::unique_ptr<Shtc3Async> initialize_sensor(i2c_master_bus_handle_t bus
 
 extern "C" void app_main(void)
 {
-
     I2CBus i2c_bus(ESP32_I2C_SCL_PIN, ESP32_I2C_SDA_PIN);
-    i2c_bus.scan();
+    // i2c_bus.scan();
 
     auto shtc3 = initialize_sensor(i2c_bus);
     if(!shtc3) {
         ESP_LOGE(TAG, "Sensor initialization failed, halting");
         return;
     }
+
+    set_unused_pin_config();
 
     Screen screen(shtc3.get());
     screen.init();

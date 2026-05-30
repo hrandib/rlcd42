@@ -161,9 +161,9 @@ void Screen::display_task(void* screen_instance)
 
         u8g2_SendBuffer(u8g2);
         vTaskDelay(pdMS_TO_TICKS(10000));
-        // prepare_display_for_deep_sleep(u8g2);
-        // esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-        // esp_deep_sleep_start();
+        prepare_display_for_deep_sleep(u8g2);
+        esp_sleep_enable_timer_wakeup(5 * uS_TO_S_FACTOR);
+        esp_deep_sleep_start();
     }
     vTaskDelete(NULL);
 }
