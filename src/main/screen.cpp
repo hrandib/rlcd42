@@ -18,6 +18,7 @@
 #include <format>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <ranges>
 #include <stdio.h>
 
 static const char* TAG = "screen";
@@ -84,16 +85,37 @@ void draw_grid(U8g2Drawables& drawer)
 #define uS_TO_S_FACTOR 1000000ULL /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  5          /* Time ESP32 will go to sleep (in seconds) */
 
+/**
+ * @brief Format a floating-point value into a buffer with specified decimal places and an optional unit.
+ * @param buffer The buffer to format the value into.
+ * @param value The floating-point value to format.
+ * @param decimals The number of decimal places to display.
+ * @param unit The unit symbol to append (optional).
+ * @return A pointer to the formatted string.
+ */
+static const char* format_env(std::ranges::contiguous_range auto& buffer,
+                              float value,
+                              int decimals = 1,
+                              char unit = '\0')
+{
+    auto result = std::format_to(buffer.data(), "{:.{}f}", value, decimals);
+    if(unit != '\0') {
+        *result++ = unit;
+    }
+    *result = '\0';
+    return buffer.data();
+}
+
 void Screen::display_task(void* screen_instance)
 {
+    Adc_PortInit();
     Screen* screen = static_cast<Screen*>(screen_instance);
     u8g2_t* u8g2 = screen->u8g2_;
     Shtc3Async& shtc3 = screen->shtc3_;
-    Adc_PortInit();
-
+    U8g2Drawables drawer(u8g2);
+    std::array<char, 64> text_buffer;
     while(true) {
         u8g2_ClearBuffer(u8g2);
-        U8g2Drawables drawer(u8g2);
         draw_grid(drawer);
 
         // Read sensor data
@@ -104,10 +126,8 @@ void Screen::display_task(void* screen_instance)
 
         // Display sensor values
         drawer.SetFont(u8g2_font_logisoso78_tn);
-        auto text = std::format("{:.1f}", sdata.temperature);
-        drawer.DrawStr(5, 120, text.c_str());
-        text = std::format("{:.1f}", sdata.humidity);
-        drawer.DrawStr(-180, 120, text.c_str());
+        drawer.DrawStr(5, 120, format_env(text_buffer, sdata.temperature));
+        drawer.DrawStr(-185, 120, format_env(text_buffer, sdata.humidity));
 
         drawer.SetFont(u8g2_font_crox5hb_tf);
         drawer.DrawCenteredStrUtf8(100, 30, "°C");
@@ -118,8 +138,7 @@ void Screen::display_task(void* screen_instance)
         drawer.SetFont(u8g2_font_profont17_mr);
 
         auto battery_level = Adc_GetBatteryLevel();
-        auto battery_text = std::format("{}%", battery_level);
-        drawer.DrawStr(-40, -4, battery_text.c_str());
+        drawer.DrawStr(-40, -4, format_env(text_buffer, battery_level, 0, '%'));
 
         u8g2_SendBuffer(u8g2);
         vTaskDelay(pdMS_TO_TICKS(10000));
